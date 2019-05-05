@@ -628,4 +628,4 @@ var warninglogEmbed = new Discord.RichEmbed() // Creates the embed that's DM'ed 
 
 
  // Log our bot in using the token from https://discordapp.com/developers/applications/me
-client.login('NTQ3OTc4Mzk3MTYzMTkyMzIw.D0-uiA.QBOFmpKn4lfsThUvYrDGTuthDdc');
+client.login('token');
