@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const {Client, RichEmbed} = require('discord.js');
+const package = require('./package.json');
 const eco = require("discord-economy");
 const dl = require('discord-leveling');
 const fs = require("fs");
@@ -71,8 +72,9 @@ client.on('message', message => {
  message.reply('no ur mom');
  } 
 
- if (message.content === 'ping') {
- message.reply('pong');
+
+ if (message.content === 'j.ping') {
+ message.reply(`pong \`${client.pings.length}ms\``);
  }
   
   if (message.content === 'j.guilds') {
@@ -111,6 +113,7 @@ client.on('message', message => {
  **The Leaderboard Command is being fixed**`, true)
 .addField('Moderation Commands',`
 **In order to use commands here, you must have the permission of what the bot is doing.**
+- "ping" sends the ping in ms
 - "clear" clears last 99 messages sent
 - "warn" warns mentioned member | Manage Messages perm is required for this command.
 - "kick" kicks mentioned member
@@ -288,7 +291,73 @@ channel.send(embed);
 });
 
 client.on('ready', () => {
-	client.user.setActivity("j.help | Prefix is j.");
+client.user.setActivity('jeromebot.gq | j.help', { type: 'WATCHING' });
+});
+//set activity command
+   client.on('message', async message => {
+ var command = message.content.toLowerCase().slice(settings.prefix.length).split(' ')[0];
+    var args = message.content.split(' ').slice(1);
+   if (!message.content.startsWith(settings.prefix) || message.author.bot) return;
+    if (message.author.id !== '537808581496537108') return;
+if (command ==='setpresence') {
+
+client.user.setActivity(args.join(' '));
+
+message.reply('Presence Updated!');
+}
+
+if (command =='resetpresence') {
+client.user.setActivity('Prefix j. | j.help', { type: 'WATCHING' });
+message.reply('Done!');
+}
+
+if (command ==='setstatusstream') {
+    client.user.setActivity(args.join(' '), { type: "STREAMING", url: "https://www.twitch.tv/discord-jerome" });
+message.reply('status set!');
+
+}
+
+if (command ==='setstatus-online') {
+
+    client.user.setStatus("online");
+message.reply('status set!');
+
+}
+
+if (command ==='setstatus-idle') {
+
+client.user.setStatus("idle");    
+
+message.reply('status set!');
+
+}
+
+if (command ==='setstatus-dnd') {
+	client.user.setStatus("dnd");
+
+message.reply('status set!');
+
+}
+
+if (command ==='setstatus-invis') {
+	client.user.setStatus("invisible");
+
+message.reply('status set!');
+
+}
+
+if (command ==='invite') {
+
+async function replyWithInvite(message) {
+  let invite = await message.channel.createInvite({
+    maxAge: 10 * 60 * 1000 //maximum time for the invite, in milliseconds
+  }, `Requested with command by ${message.author.tag}`).catch(console.log);
+
+  message.reply(invite ? `Here's your invite: ${invite}` : "There has been an error during the creation of the invite.");
+
+}
+}
+
 });
 //economy$$$
 
@@ -376,6 +445,53 @@ client.on('message', async message => {
  
   }
  
+  if (command === '$leaderboard') {
+ 
+    //If you use discord-economy guild based you can use the filter() function to only allow the database within your guild
+    //(message.author.id + message.guild.id) can be your way to store guild based id's
+    //filter: x => x.userid.endsWith(message.guild.id)
+ 
+    //If you put a mention behind the command it searches for the mentioned user in database and tells the position.
+   if (message.mentions.users.first()) {
+ 
+      var output = await eco.Leaderboard({
+        filter: x => x.balance > 50,
+        search: message.mentions.users.first().id
+      })
+      message.channel.send(`The user ${message.mentions.users.first().tag} is number ${output} on my leaderboard!`);
+ 
+    } else {
+ 
+      eco.Leaderboard({
+        limit: 5, //Only takes top 3 ( Totally Optional )
+        filter: x => x.balance > 50 //Only allows people with more than 100 balance ( Totally Optional )
+      }).then(async users => { //make sure it is async
+ 
+        if (users[0]) var firstplace = await client.fetchUser(users[0].userid) //Searches for the user object in discord for first place
+        if (users[1]) var secondplace = await client.fetchUser(users[1].userid) //Searches for the user object in discord for second place
+        if (users[2]) var thirdplace = await client.fetchUser(users[2].userid) //Searches for the user object in discord for third place
+        if (users[3]) var fourthplace = await client.fetchUser(users[3].userid) 
+        if (users[4]) var fithhplace = await client.fetchUser(users[4].userid) 
+     
+    const embed = new RichEmbed()
+      .setDescription( `My leaderboard:
+ 
+1 - ${firstplace && firstplace.tag || 'Nobody Yet'} : ${users[0] && users[0].balance || 'None'}
+2 - ${secondplace && secondplace.tag || 'Nobody Yet'} : ${users[1] && users[1].balance || 'None'}
+3 - ${thirdplace && thirdplace.tag || 'Nobody Yet'} : ${users[2] && users[2].balance || 'None'}
+4 - ${fourthplace && fourthplace.tag || 'Nobody Yet'} : ${users[3] && users[3].balance || 'None'}
+5 - ${fithhplace && fithhplace.tag || 'Nobody Yet'} : ${users[4] && users[4].balance || 'None'}`)
+      .setTitle('Leaderboard')
+      .setAuthor(`${client.user.tag}`)
+      .setColor(0xd6ab48)
+
+      message.channel.send(embed);
+
+      })
+ 
+    }
+  }  
+
   if (command === 'dice') {
  
     var roll = args[0] //Should be number between 1 and 6
@@ -599,6 +715,7 @@ message.channel.send(succesfulembed);
     if(!mentioned) return message.channel.send(missingArgsEmbed); // Triggers if the user donsn't tag a user in the message
     let reason = args.slice(1).join(' ') // .slice(1) removes the user mention, .join(' ') joins all the words in the message, instead of just sending 1 word
     if(!reason) return message.channel.send(missingArgsEmbed); // Triggers if the user dosn't provide a reason for the warning
+     const logchannel = message.guild.channels.find(ch => ch.name === 'jlogs');
     var warningEmbed = new Discord.RichEmbed() // Creates the embed that's DM'ed to the user when their warned!
         .setColor(embedColor)
         .setAuthor(message.author.username, message.author.avatarURL)
@@ -612,7 +729,6 @@ message.channel.send(succesfulembed);
         .setTitle('User Successfully Warned!');
     message.channel.send(warnSuccessfulEmbed); // Sends the warn successful embed
     message.delete(); // Deletes the command
-const logchannel = message.guild.channels.find(ch => ch.name === 'jlogs');
 var warninglogEmbed = new Discord.RichEmbed() // Creates the embed that's DM'ed to the user when their warned!
         .setColor(embedColor)
         .setAuthor(message.author.username, message.author.avatarURL)
@@ -624,8 +740,6 @@ var warninglogEmbed = new Discord.RichEmbed() // Creates the embed that's DM'ed 
     logchannel.send(warninglogEmbed);
 }  
 });
-
-
-
+   
  // Log our bot in using the token from https://discordapp.com/developers/applications/me
 client.login('token');

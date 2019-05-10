@@ -1,4 +1,2 @@
-node_modules/
-warnings.json
 database.sqlite
-README.md
+package-lock.json
