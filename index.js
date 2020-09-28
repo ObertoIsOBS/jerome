@@ -1,14 +1,12 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const {Client, RichEmbed} = require('discord.js');
+const {Client} = require('discord.js');
 const package = require('./package.json');
-const eco = require("discord-economy");
-const dl = require('discord-leveling');
 const fs = require("fs");
 const ms = require("ms");
 const SelfReloadJSON = require('self-reload-json');
-const profanities = require('profanities');
-const racialSlur = require('./racial-slur');
+const profanities = require('fuck, shit, bitch, ass, cock, sex, dick');
+const racialSlur = require('nigger');
 const snekfetch = require('snekfetch');
 let settingsFile = JSON.parse(fs.readFileSync('./settings.json', 'utf8'));
 let settings = new SelfReloadJSON(__dirname + '/settings.json');
